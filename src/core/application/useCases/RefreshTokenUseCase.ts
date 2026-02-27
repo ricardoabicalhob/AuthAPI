@@ -14,22 +14,15 @@ export class RefreshTokenUseCase {
     ) {}
 
     async execute(refreshToken :string) {
-        const hash = crypto
-            .createHash("sha256")
-            .update(refreshToken)
-            .digest("hex")
+        const hash = this.tokenService.hashToken(refreshToken)
 
         const storedToken = await this.refreshTokenQueryRepository.findByHash(hash)
 
-        if(!storedToken) {
-            throw new UnauthorizedError()
-        }
-
-        if(storedToken.revokeAt) {
-            throw new UnauthorizedError()
-        }
-
-        if(storedToken.expiresAt < new Date()) {
+        if(
+            !storedToken ||
+            storedToken.revokeAt ||
+            storedToken.expiresAt < new Date()
+        ) {
             throw new UnauthorizedError()
         }
 
@@ -39,6 +32,13 @@ export class RefreshTokenUseCase {
             throw new UserNotFoundError()
         }
 
+        if(
+            user.passwordChangeAt &&
+            storedToken.createdAt < user.passwordChangeAt
+        ) {
+            throw new UnauthorizedError()
+        }
+
         await this.refreshTokenRepository.revoke(storedToken.id)
 
         const accessToken = this.tokenService.generateAccessToken(
@@ -46,12 +46,12 @@ export class RefreshTokenUseCase {
             user.passwordChangeAt
         )
 
-        const { token, hash: newHash } = this.tokenService.generateRefreshToken()
+        const { token, hash: newHash, expiresAt } = this.tokenService.generateRefreshToken()
 
         await this.refreshTokenRepository.create({
             userId: user.id,
             tokenHash: newHash,
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            expiresAt
         })
 
         return {

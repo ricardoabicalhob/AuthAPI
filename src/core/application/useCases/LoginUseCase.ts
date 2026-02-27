@@ -41,11 +41,11 @@ export class LoginUseCase {
 
         const accessToken = this.tokenService.generateAccessToken(user.id)
 
-        const { token, hash } = this.tokenService.generateRefreshToken()
+        const { token, hash, expiresAt } = this.tokenService.generateRefreshToken()
         await this.refreshTokenRepository.create({
             userId: user.id,
             tokenHash: hash,
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            expiresAt
         })
 
         return {

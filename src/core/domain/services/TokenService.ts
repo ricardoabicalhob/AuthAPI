@@ -10,7 +10,6 @@ interface JwtPayload {
 export class TokenService {
 
     private privateKey = getPrivateKey()
-    private refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET!
 
     generateAccessToken(userId :string, passwordChangeAt? :Date | null) {
         return jwt.sign(
@@ -31,7 +30,6 @@ export class TokenService {
         )
     }
 
-    // generateRefreshToken(userId :string, passwordChangeAt? :Date | null) {
     generateRefreshToken() {
         const token = crypto.randomBytes(40).toString("hex")
 
@@ -40,27 +38,22 @@ export class TokenService {
             .update(token)
             .digest("hex")
 
-        return {token, hash}
-        // return jwt.sign(
-        //     {
-        //         passwordChangeAt: passwordChangeAt
-        //             ? Math.floor(passwordChangeAt.getTime() / 1000)
-        //             : undefined
-        //     },
-        //     this.refreshTokenSecret,
-        //     {
-        //         subject: userId,
-        //         expiresIn: "7d"
-        //     }
-        // )
+        return {
+            token, 
+            hash,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
     }
 
     verifyAccessToken(token :string) {
         return jwt.verify(token, this.privateKey) as JwtPayload
     }
 
-    verifyRefreshToken(token :string) {
-        return jwt.verify(token, this.refreshTokenSecret) as JwtPayload
+    hashToken(token: string) {
+        return crypto
+            .createHash("sha256")
+            .update(token)
+            .digest("hex")
     }
 
     generateResetToken() {
