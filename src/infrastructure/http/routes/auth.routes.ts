@@ -2,14 +2,18 @@ import type { FastifyInstance } from "fastify"
 import { makeAuthController } from "../factories/MakeAuthController"
 import { makeRefreshTokenController } from "../factories/MakeRefreshTokenController"
 import { makeGetJwksController } from "../factories/MakeGetJwksController"
+import { loginSchema } from "../schemas/auth/login.schema"
+import { refreshTokenSchema } from "../schemas/auth/refresh-token.schema"
+import { logoutSchema } from "../schemas/auth/logout.schema"
+import { jwksSchema } from "../schemas/auth/jwks.schema"
 
 export async function authRoutes(app: FastifyInstance) {
   const authController = makeAuthController()
   const getJwksController = makeGetJwksController()
   const refreshTokenController = makeRefreshTokenController()
 
-  app.post("/login", authController.login.bind(authController))
-  app.post("/logout", authController.logout.bind(authController))
-  app.post("/refresh", refreshTokenController.handle.bind(refreshTokenController))
-  app.get('/.well-known/jwks.json', getJwksController.handle.bind(getJwksController))
+  app.post("/login", { schema: loginSchema }, authController.login.bind(authController))
+  app.post("/logout", { schema: logoutSchema }, authController.logout.bind(authController))
+  app.post("/refresh", { schema: refreshTokenSchema }, refreshTokenController.handle.bind(refreshTokenController))
+  app.get('/.well-known/jwks.json', { schema: jwksSchema }, getJwksController.handle.bind(getJwksController))
 }
