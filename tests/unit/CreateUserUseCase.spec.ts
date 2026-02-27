@@ -1,13 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { CreateUserUseCase } from "../../src/core/useCases/CreateUserUseCase"
+import { CreateUserUseCase } from "../../src/core/application/useCases/CreateUserUseCase"
 import { makeUserQueryRepositoryMock, makeUserRepositoryMock } from "../factories/user/MakeUserRepositories"
-import type { HashService } from "../../src/core/services/HashService"
+import type { UserPasswordHashService } from "../../src/core/domain/services/UserPasswordHashService"
 import type { IUserQueryRepository, IUserRepository } from "../../src/interfaces/repositories/UserRepository"
+import { EmailAlreadyRegisteredError } from "../../src/core/domain/erros/EmailAlreadyRegisteredError"
 
 describe("CreateUserUseCase", () => {
   let userRepository: IUserRepository
   let userQueryRepository: IUserQueryRepository
-  let hashService: HashService
+  let hashService: UserPasswordHashService
   let sut: CreateUserUseCase
 
   beforeEach(() => {
@@ -16,7 +17,7 @@ describe("CreateUserUseCase", () => {
 
     hashService = {
       hash: vi.fn()
-    } as unknown as HashService
+    } as unknown as UserPasswordHashService
 
     sut = new CreateUserUseCase(
       userRepository,
@@ -65,7 +66,7 @@ describe("CreateUserUseCase", () => {
         email: "user@email.com",
         password: "12345678"
       })
-    ).rejects.toThrow("E-mail já cadastrado.")
+    ).rejects.toBeInstanceOf(EmailAlreadyRegisteredError)
 
     expect(userQueryRepository.findByEmail).toHaveBeenCalledWith("user@email.com")
     expect(hashService.hash).not.toHaveBeenCalled()

@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
-import { RefreshTokenUseCase } from "../../src/core/useCases/RefreshTokenUseCase"
+import { RefreshTokenUseCase } from "../../src/core/application/useCases/RefreshTokenUseCase"
 import type { IUserQueryRepository } from "../../src/interfaces/repositories/UserRepository"
-import type { TokenService } from "../../src/core/services/TokenService"
+import type { TokenService } from "../../src/core/domain/services/TokenService"
 
 import { makeUserQueryRepositoryMock } from "../factories/user/MakeUserRepositories"
-import { UnauthorizedError } from "../../src/core/erros/UnauthorizedError"
-import { UserNotFoundError } from "../../src/core/erros/UserNotFoundError"
+import { UnauthorizedError } from "../../src/core/domain/erros/UnauthorizedError"
+import { UserNotFoundError } from "../../src/core/domain/erros/UserNotFoundError"
 
 describe("RefreshTokenUseCase", () => {
   let userQueryRepository: IUserQueryRepository

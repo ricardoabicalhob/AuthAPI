@@ -1,6 +1,6 @@
-import type { IUserQueryRepository, IUserRepository } from "../../interfaces/repositories/UserRepository";
-import type { MailService } from "../services/MailService";
-import type { TokenService } from "../services/TokenService";
+import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository";
+import type { MailService } from "../../domain/services/MailService";
+import type { TokenService } from "../../domain/services/TokenService";
 
 export class RequestPasswordResetUseCase {
     constructor(
@@ -25,7 +25,7 @@ export class RequestPasswordResetUseCase {
             expiresAt
         )
 
-        const resetLink = `https://app.exemplo.com/reset-password?token=${token}`
+        const resetLink = `http://localhost:5173?token=${token}`
 
         await this.mailService.sendPasswordReset(
             user.email,

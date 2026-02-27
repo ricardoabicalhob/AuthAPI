@@ -1,5 +1,5 @@
 export class UserNotFoundError extends Error {
-  public readonly statusCode = 401
+  public readonly statusCode = 404
 
   constructor() {
     super("Usuário não encontrado")

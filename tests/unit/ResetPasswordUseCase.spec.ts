@@ -1,25 +1,25 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
-import { ResetPasswordUseCase } from "../../src/core/useCases/ResetPasswordUseCase"
+import { ResetPasswordUseCase } from "../../src/core/application/useCases/ResetPasswordUseCase"
 
 import type {
   IUserRepository,
   IUserQueryRepository
 } from "../../src/interfaces/repositories/UserRepository"
 
-import type { HashService } from "../../src/core/services/HashService"
-import type { TokenHashService } from "../../src/core/services/TokenHashService"
+import type { UserPasswordHashService } from "../../src/core/domain/services/UserPasswordHashService"
+import type { TokenHashService } from "../../src/core/domain/services/TokenHashService"
 
 import {
   makeUserRepositoryMock,
   makeUserQueryRepositoryMock
 } from "../factories/user/MakeUserRepositories"
-import { UnauthorizedError } from "../../src/core/erros/UnauthorizedError"
+import { UnauthorizedError } from "../../src/core/domain/erros/UnauthorizedError"
 
 describe("ResetPasswordUseCase", () => {
   let userRepository: IUserRepository
   let userQueryRepository: IUserQueryRepository
-  let hashService: HashService
+  let hashService: UserPasswordHashService
   let tokenHashService: TokenHashService
   let sut: ResetPasswordUseCase
 
@@ -29,7 +29,7 @@ describe("ResetPasswordUseCase", () => {
 
     hashService = {
       hash: vi.fn()
-    } as unknown as HashService
+    } as unknown as UserPasswordHashService
 
     tokenHashService = {
       hash: vi.fn()

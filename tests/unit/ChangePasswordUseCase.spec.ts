@@ -7,20 +7,20 @@ import type {
   IUserRepository
 } from "../../src/interfaces/repositories/UserRepository"
 
-import type { HashService } from "../../src/core/services/HashService"
-import { ChangePasswordUseCase } from "../../src/core/useCases/ChangePasswordUseCase"
+import type { UserPasswordHashService } from "../../src/core/domain/services/UserPasswordHashService"
+import { ChangePasswordUseCase } from "../../src/core/application/useCases/ChangePasswordUseCase"
 
 import {
   makeUserQueryRepositoryMock,
   makeUserRepositoryMock
 } from "../factories/user/MakeUserRepositories"
-import { UserNotFoundError } from "../../src/core/erros/UserNotFoundError"
-import { UnauthorizedError } from "../../src/core/erros/UnauthorizedError"
+import { UserNotFoundError } from "../../src/core/domain/erros/UserNotFoundError"
+import { UnauthorizedError } from "../../src/core/domain/erros/UnauthorizedError"
 
 describe("ChangePasswordUseCase", () => {
   let userRepository: IUserRepository
   let userQueryRepository: IUserQueryRepository
-  let hashService: HashService
+  let hashService: UserPasswordHashService
   let sut: ChangePasswordUseCase
 
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe("ChangePasswordUseCase", () => {
 
     hashService = {
       hash: vi.fn()
-    } as unknown as HashService
+    } as unknown as UserPasswordHashService
 
     sut = new ChangePasswordUseCase(
       userRepository,

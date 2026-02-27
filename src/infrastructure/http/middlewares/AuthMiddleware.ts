@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify"
-import { TokenService } from "../../../core/services/TokenService"
+import { TokenService } from "../../../core/domain/services/TokenService"
 import { UserPrismaQueryRepository } from "../../database/UserPrismaRepository"
-import { UnauthorizedError } from "../../../core/erros/UnauthorizedError"
+import { UnauthorizedError } from "../../../core/domain/erros/UnauthorizedError"
 
 interface JwtPayload {
     sub :string

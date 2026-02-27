@@ -1,5 +1,5 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import type { RefreshTokenUseCase } from "../../../core/useCases/RefreshTokenUseCase";
+import type { RefreshTokenUseCase } from "../../../core/application/useCases/RefreshTokenUseCase";
 
 export class RefreshTokenController {
     constructor(

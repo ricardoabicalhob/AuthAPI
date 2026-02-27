@@ -1,11 +1,9 @@
-// infra/http/controllers/UserController.ts
-
 import type { FastifyReply, FastifyRequest } from "fastify"
-import type { CreateUserUseCase } from "../../../core/useCases/CreateUserUseCase"
-import type { RequestPasswordResetUseCase } from "../../../core/useCases/RequestPasswordResetUseCase"
-import type { ResetPasswordUseCase } from "../../../core/useCases/ResetPasswordUseCase"
-import type { ChangePasswordUseCase } from "../../../core/useCases/ChangePasswordUseCase"
-import type { DeleteUserUseCase } from "../../../core/useCases/DeleteUserUseCase"
+import type { CreateUserUseCase } from "../../../core/application/useCases/CreateUserUseCase"
+import type { RequestPasswordResetUseCase } from "../../../core/application/useCases/RequestPasswordResetUseCase"
+import type { ResetPasswordUseCase } from "../../../core/application/useCases/ResetPasswordUseCase"
+import type { ChangePasswordUseCase } from "../../../core/application/useCases/ChangePasswordUseCase"
+import type { DeleteUserUseCase } from "../../../core/application/useCases/DeleteUserUseCase"
 
 export class UserController {
   constructor(

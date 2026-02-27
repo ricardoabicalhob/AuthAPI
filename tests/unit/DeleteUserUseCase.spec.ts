@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
-import { DeleteUserUseCase } from "../../src/core/useCases/DeleteUserUseCase"
+import { DeleteUserUseCase } from "../../src/core/application/useCases/DeleteUserUseCase"
 import type { IUserQueryRepository, IUserRepository } from "../../src/interfaces/repositories/UserRepository"
-import { UserNotFoundError } from "../../src/core/erros/UserNotFoundError"
+import { UserNotFoundError } from "../../src/core/domain/erros/UserNotFoundError"
 import { makeUserRepositoryMock, makeUserQueryRepositoryMock } from "../factories/user/MakeUserRepositories"
 
 describe("DeleteUserUseCase", () => {

@@ -1,11 +1,11 @@
 import type { FastifyInstance } from "fastify"
 import { makeUserController } from "../factories/MakeUserController"
 import { authMiddleware } from "../middlewares/AuthMiddleware"
-import { userCreateSchema } from "../schemas/user-create.schema"
-import { userPasswordForgotSchema } from "../schemas/user-password-forgot.schema"
-import { userPasswordResetSchema } from "../schemas/user-password-reset.schema"
-import { userPasswordChangeSchema } from "../schemas/user-password-change.schema"
-import { userDeleteSchema } from "../schemas/user-delete.schema"
+import { userCreateSchema } from "../schemas/user/user-create.schema"
+import { userPasswordForgotSchema } from "../schemas/user/user-password-forgot.schema"
+import { userPasswordResetSchema } from "../schemas/user/user-password-reset.schema"
+import { userPasswordChangeSchema } from "../schemas/user/user-password-change.schema"
+import { userDeleteSchema } from "../schemas/user/user-delete.schema"
 
 
 export async function userRoutes(app: FastifyInstance) {

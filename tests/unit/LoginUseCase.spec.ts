@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import bcrypt from "bcrypt"
 
-import { LoginUseCase } from "../../src/core/useCases/LoginUseCase"
+import { LoginUseCase } from "../../src/core/application/useCases/LoginUseCase"
 import type { IUserQueryRepository } from "../../src/interfaces/repositories/UserRepository"
-import type { TokenService } from "../../src/core/services/TokenService"
+import type { TokenService } from "../../src/core/domain/services/TokenService"
 
-import { InvalidCredentialsError } from "../../src/core/erros/InvalidCredentialError"
-import { UserNotFoundError } from "../../src/core/erros/UserNotFoundError"
+import { InvalidCredentialsError } from "../../src/core/domain/erros/InvalidCredentialError"
+import { UserNotFoundError } from "../../src/core/domain/erros/UserNotFoundError"
 
 import { makeUserQueryRepositoryMock } from "../factories/user/MakeUserRepositories"
 

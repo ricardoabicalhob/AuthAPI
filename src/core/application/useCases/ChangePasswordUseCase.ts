@@ -1,14 +1,14 @@
 import bcrypt from "bcrypt"
-import type { IUserQueryRepository, IUserRepository } from "../../interfaces/repositories/UserRepository";
-import type { HashService } from "../services/HashService";
-import { UserNotFoundError } from "../erros/UserNotFoundError";
-import { UnauthorizedError } from "../erros/UnauthorizedError";
+import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository";
+import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
+import { UserNotFoundError } from "../../domain/erros/UserNotFoundError";
+import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
 
 export class ChangePasswordUseCase {
     constructor(
         private readonly userRepository :IUserRepository,
         private readonly userQueryRepository :IUserQueryRepository,
-        private readonly hashService :HashService
+        private readonly hashService :UserPasswordHashService
     ) {}
 
     async execute(

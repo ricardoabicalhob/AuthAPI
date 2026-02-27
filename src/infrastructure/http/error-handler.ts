@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify"
-import type { AppError } from "../../core/erros/AppError"
+import type { AppError } from "../../core/domain/erros/AppError"
 
 function isAppError(error: unknown): error is AppError {
   return (

@@ -1,12 +1,12 @@
-import { HashService } from "../../../core/services/HashService"
-import { MailService } from "../../../core/services/MailService"
-import { TokenHashService } from "../../../core/services/TokenHashService"
-import { TokenService } from "../../../core/services/TokenService"
-import { ChangePasswordUseCase } from "../../../core/useCases/ChangePasswordUseCase"
-import { CreateUserUseCase } from "../../../core/useCases/CreateUserUseCase"
-import { DeleteUserUseCase } from "../../../core/useCases/DeleteUserUseCase"
-import { RequestPasswordResetUseCase } from "../../../core/useCases/RequestPasswordResetUseCase"
-import { ResetPasswordUseCase } from "../../../core/useCases/ResetPasswordUseCase"
+import { UserPasswordHashService } from "../../../core/domain/services/UserPasswordHashService"
+import { MailService } from "../../../core/domain/services/MailService"
+import { TokenHashService } from "../../../core/domain/services/TokenHashService"
+import { TokenService } from "../../../core/domain/services/TokenService"
+import { ChangePasswordUseCase } from "../../../core/application/useCases/ChangePasswordUseCase"
+import { CreateUserUseCase } from "../../../core/application/useCases/CreateUserUseCase"
+import { DeleteUserUseCase } from "../../../core/application/useCases/DeleteUserUseCase"
+import { RequestPasswordResetUseCase } from "../../../core/application/useCases/RequestPasswordResetUseCase"
+import { ResetPasswordUseCase } from "../../../core/application/useCases/ResetPasswordUseCase"
 import { UserPrismaQueryRepository, UserPrismaRepository } from "../../database/UserPrismaRepository"
 import { UserController } from "../controllers/UserController"
 
@@ -14,7 +14,7 @@ export function makeUserController() {
   const userRepository = new UserPrismaRepository()
   const userQueryRepository = new UserPrismaQueryRepository()
 
-  const hashService = new HashService()
+  const hashService = new UserPasswordHashService()
   const tokenHashService = new TokenHashService()
   const mailService = new MailService()
   const tokenService = new TokenService()

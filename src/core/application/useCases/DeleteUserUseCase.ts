@@ -1,5 +1,5 @@
-import type { IUserQueryRepository, IUserRepository } from "../../interfaces/repositories/UserRepository"
-import { UserNotFoundError } from "../erros/UserNotFoundError"
+import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository"
+import { UserNotFoundError } from "../../domain/erros/UserNotFoundError"
 
 export class DeleteUserUseCase {
   constructor(

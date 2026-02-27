@@ -1,13 +1,13 @@
-import type { IUserQueryRepository, IUserRepository } from "../../interfaces/repositories/UserRepository";
-import { UnauthorizedError } from "../erros/UnauthorizedError";
-import type { HashService } from "../services/HashService";
-import type { TokenHashService } from "../services/TokenHashService";
+import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository";
+import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
+import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
+import type { TokenHashService } from "../../domain/services/TokenHashService";
 
 export class ResetPasswordUseCase {
     constructor(
         private readonly userRepository :IUserRepository,
         private readonly userQueryRepository :IUserQueryRepository,
-        private readonly hashService :HashService,
+        private readonly hashService :UserPasswordHashService,
         private readonly tokenHashService :TokenHashService
     ) {}
 

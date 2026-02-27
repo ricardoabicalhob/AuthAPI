@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
-import { RequestPasswordResetUseCase } from "../../src/core/useCases/RequestPasswordResetUseCase"
+import { RequestPasswordResetUseCase } from "../../src/core/application/useCases/RequestPasswordResetUseCase"
 import type { IUserRepository, IUserQueryRepository } from "../../src/interfaces/repositories/UserRepository"
-import type { TokenService } from "../../src/core/services/TokenService"
-import type { MailService } from "../../src/core/services/MailService"
+import type { TokenService } from "../../src/core/domain/services/TokenService"
+import type { MailService } from "../../src/core/domain/services/MailService"
 
 import {
   makeUserRepositoryMock,
@@ -18,6 +18,8 @@ describe("RequestPasswordResetUseCase", () => {
   let sut: RequestPasswordResetUseCase
 
   beforeEach(() => {
+    vi.restoreAllMocks()
+
     userRepository = makeUserRepositoryMock()
     userQueryRepository = makeUserQueryRepositoryMock()
 
@@ -35,12 +37,10 @@ describe("RequestPasswordResetUseCase", () => {
       tokenService,
       mailService
     )
-
-    vi.restoreAllMocks()
   })
 
   it("não deve fazer nada se o usuário não existir", async () => {
-    userQueryRepository.findByEmail = vi.fn().mockResolvedValue(null)
+    vi.spyOn(userQueryRepository, "findByEmail").mockResolvedValue(null)
 
     await sut.execute("user@email.com")
 
@@ -49,14 +49,14 @@ describe("RequestPasswordResetUseCase", () => {
   })
 
   it("deve gerar token, salvar hash e enviar e-mail quando usuário existir", async () => {
-    userQueryRepository.findByEmail = vi.fn().mockResolvedValue({
+    vi.spyOn(userQueryRepository, "findByEmail").mockResolvedValue({
       id: "user-id",
       email: "user@email.com",
       passwordChangeAt: null,
       deletedAt: null
     })
 
-    ;(tokenService.generateResetToken as any).mockReturnValue({
+    vi.spyOn(tokenService, "generateResetToken").mockReturnValue({
       token: "plain-reset-token",
       hash: "hashed-reset-token"
     })
@@ -75,7 +75,7 @@ describe("RequestPasswordResetUseCase", () => {
 
     expect(mailService.sendPasswordReset).toHaveBeenCalledWith(
       "user@email.com",
-      "https://app.exemplo.com/reset-password?token=plain-reset-token"
+      "http://localhost:5173?token=plain-reset-token"
     )
 
     nowSpy.mockRestore()
