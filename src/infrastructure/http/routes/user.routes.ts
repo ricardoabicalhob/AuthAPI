@@ -11,32 +11,34 @@ import { userDeleteSchema } from "../schemas/user/user-delete.schema"
 export async function userRoutes(app: FastifyInstance) {
   const userController = makeUserController()
 
-  app.post(
-    "/", 
-    { schema: userCreateSchema }, 
-    userController.create.bind(userController))
+  app.post("/", { schema: userCreateSchema }, userController.create.bind(userController))
 
   app.post(
-    "/password/forgot",
-    { schema: userPasswordForgotSchema },
+    "/password/forgot", { 
+      schema: userPasswordForgotSchema,
+      config: {
+        rateLimit: {
+          max: 3,
+          timeWindow: "5 minutes"
+        }
+      }
+    },
     userController.requestPasswordReset.bind(userController)
   )
 
-  app.post(
-    "/password/reset",
-    { schema: userPasswordResetSchema },
+  app.post("/password/reset", { 
+    schema: userPasswordResetSchema, 
+    config: {
+      rateLimit: {
+        max: 5,
+        timeWindow: "5 minutes"
+      }
+    }
+  },
     userController.resetPassword.bind(userController)
   )
 
-  app.post(
-    "/password/change",
-    { schema: userPasswordChangeSchema, preHandler: authMiddleware },
-    userController.changePassword.bind(userController)
-  )
+  app.post("/password/change", { schema: userPasswordChangeSchema, preHandler: authMiddleware }, userController.changePassword.bind(userController))
 
-  app.delete(
-    "/me",
-    { schema: userDeleteSchema , preHandler: authMiddleware },
-    userController.deleteUser.bind(userController)
-  )
+  app.delete("/me", { schema: userDeleteSchema , preHandler: authMiddleware }, userController.deleteUser.bind(userController))
 }

@@ -1,4 +1,5 @@
 import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository"
+import { User } from "../../domain/entities/User.entity"
 import { UserNotFoundError } from "../../domain/erros/UserNotFoundError"
 
 export class DeleteUserUseCase {
@@ -8,12 +9,30 @@ export class DeleteUserUseCase {
   ) {}
 
   async execute(userId: string): Promise<void> {
-    const user = await this.userQueryRepository.findById(userId)
+    const userPersistido = await this.userQueryRepository.findById(userId)
 
-    if (!user || user.deletedAt) {
+    if (!userPersistido || userPersistido.deletedAt) {
       throw new UserNotFoundError()
     }
 
-    await this.userRepository.softDelete(userId)
+    const user = User.restore(
+      {
+        email: userPersistido.email,
+        password: userPersistido.password,
+        passwordChangeAt: userPersistido.passwordChangeAt,
+        passwordResetToken: userPersistido.passwordResetToken,
+        passwordResetExpiresAt: userPersistido.passwordResetExpiresAt,
+        deletedAt: userPersistido.deletedAt
+      },
+      userPersistido.id
+    )
+
+    user.softDelete()
+
+    await this.userRepository.softDelete(
+      user.getId(),
+      user.getPasswordChangeAtOrThrow(),
+      user.getDeletedAtOrThrow()
+    )
   }
 }

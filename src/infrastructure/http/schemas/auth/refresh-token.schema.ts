@@ -2,7 +2,7 @@ import { type FastifySchema } from "fastify"
 
 export const refreshTokenSchema: FastifySchema = {
   summary: "Gerar novo access token",
-  description: "Recebe um refreshToken válido e retorna um novo accessToken.",
+  description: "Recebe um refreshToken válido e retorna um novo accessToken e um novo refreshToken.",
   tags: ["Autenticação"],
 
   body: {
@@ -21,6 +21,9 @@ export const refreshTokenSchema: FastifySchema = {
       type: "object",
       properties: {
         accessToken: {
+          type: "string"
+        },
+        refreshToken: {
           type: "string"
         }
       }

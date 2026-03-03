@@ -13,6 +13,7 @@ export async function registerSwagger(app: FastifyInstance) {
 
       tags: [
         { name: "Usuários", description: "Criação de usuário, alteração e recuperação de senha." },
+        { name: "Autenticação", description: "Login, logout, refresh token e chave pública para validação de token" }
       ],
 
       components: {
@@ -24,15 +25,6 @@ export async function registerSwagger(app: FastifyInstance) {
           }
         }
       },
-
-      /**
-       * 🔐 Aplica autenticação por padrão em TODAS as rotas
-       */
-      // security: [
-      //   {
-      //     bearerAuth: []
-      //   }
-      // ]
     }, 
     hideUntagged: true,
   })

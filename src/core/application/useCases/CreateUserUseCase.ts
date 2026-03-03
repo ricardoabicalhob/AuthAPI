@@ -1,5 +1,6 @@
 import type { CreateUserDTO } from "../../../interfaces/dtos/User/CreateUserDTO";
 import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository";
+import { User } from "../../domain/entities/User.entity";
 import { EmailAlreadyRegisteredError } from "../../domain/erros/EmailAlreadyRegisteredError";
 import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
 
@@ -19,11 +20,17 @@ export class CreateUserUseCase {
 
         const passwordHash = await this.hashService.hash(data.password)
 
-        const user = await this.userRepository.create(
-            data.email,
-            passwordHash
+        const user = User.create({
+            email: data.email,
+            password: passwordHash
+        })
+
+        const userCreated = await this.userRepository.create(
+            user.getId(),
+            user.getEmail(),
+            user.getPassword()
         )
 
-        return user
+        return userCreated
     }
 }

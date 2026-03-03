@@ -6,18 +6,46 @@ import { env } from './config/env';
 import { userRoutes } from '../infrastructure/http/routes/user.routes';
 import { authRoutes } from '../infrastructure/http/routes/auth.routes';
 import { registerErrorHandler } from '../infrastructure/http/error-handler';
+import helmet from '@fastify/helmet';
+import rateLimit from '@fastify/rate-limit';
 
 async function bootstrap() {
     const PORT = 3100
 
     const app = fastify({
-        logger: true
+        logger: true,
+        trustProxy: true
+    })
+
+    await app.register(helmet, {
+        global: true
+    })
+
+    await app.register(rateLimit, {
+        max: 100,
+        timeWindow: "1 minute"
     })
 
     app.register(cors, {
-        origin: env.FRONTEND_URL,
+        origin: (origin, callback) => {
+            const allowedOrigins = [
+                env.FRONTEND_URL
+            ]
+
+            if(!origin || allowedOrigins.includes(origin)) {
+                callback(null, true)
+                return
+            }
+
+            callback(new Error("Not allowed by CORS"), false)
+        },
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
     })
+
+    // app.register(cors, {
+    //     origin: env.FRONTEND_URL,
+    //     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+    // })
     
     await registerSwagger(app)
 

@@ -1,15 +1,20 @@
 import crypto from "crypto"
 import jwt from "jsonwebtoken"
-import { getPrivateKey } from "../../../utils/keys"
+import { getPrivateKey, getPublicKey } from "../../../utils/keys"
 
 interface JwtPayload {
-  sub: string
-  passwordChangeAt?: number
+  passwordChangeAt: Date,
+    iat: number,
+    exp: number,
+    aud: string,
+    iss: string,
+    sub: string
 }
 
 export class TokenService {
 
     private privateKey = getPrivateKey()
+    private publicKey = getPublicKey()
 
     generateAccessToken(userId :string, passwordChangeAt? :Date | null) {
         return jwt.sign(
@@ -46,7 +51,11 @@ export class TokenService {
     }
 
     verifyAccessToken(token :string) {
-        return jwt.verify(token, this.privateKey) as JwtPayload
+        return jwt.verify(token, this.publicKey, {
+            algorithms: ["RS256"],
+            issuer: "http://localhost:3100",
+            audience: "sgra-api"
+        }) as JwtPayload
     }
 
     hashToken(token: string) {

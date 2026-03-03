@@ -2,6 +2,7 @@ import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/
 import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
 import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
 import type { TokenHashService } from "../../domain/services/TokenHashService";
+import { User } from "../../domain/entities/User.entity";
 
 export class ResetPasswordUseCase {
     constructor(
@@ -14,15 +15,39 @@ export class ResetPasswordUseCase {
     async execute(token :string, newPassword :string) :Promise<void> {
         const tokenHash = this.tokenHashService.hash(token)
 
-        const user = await this.userQueryRepository.findByPasswordResetToken(tokenHash)
+        const userPersistido = await this.userQueryRepository.findByPasswordResetToken(tokenHash)
         
-        if(!user) {
+        if(!userPersistido) {
             throw new UnauthorizedError()
         }
 
+        const user = User.restore(
+            {
+                email: userPersistido.email,
+                password: userPersistido.password,
+                passwordChangeAt: userPersistido.passwordChangeAt,
+                passwordResetToken: userPersistido.passwordResetToken,
+                passwordResetExpiresAt: userPersistido.passwordResetExpiresAt,
+                deletedAt: userPersistido.deletedAt
+            },
+            userPersistido.id
+        )
+
         const passwordHash = await this.hashService.hash(newPassword)
 
-        await this.userRepository.updatePassword(user.id, passwordHash)
-        await this.userRepository.clearPasswordResetToken(user.id)  
+        user.changePassword(passwordHash)
+        user.clearPasswordResetToken()
+
+        await this.userRepository.updatePassword(
+            user.getId(), 
+            user.getPassword(),
+            user.getPasswordChangeAtOrThrow()
+        )
+
+        await this.userRepository.clearPasswordResetToken(
+            user.getId(),
+            user.getPasswordResetTokenOrThrow(),
+            user.getPasswordResetExpiresAtOrThrow()
+        )  
     }
 }

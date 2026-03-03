@@ -12,8 +12,35 @@ export async function authRoutes(app: FastifyInstance) {
   const getJwksController = makeGetJwksController()
   const refreshTokenController = makeRefreshTokenController()
 
-  app.post("/login", { schema: loginSchema }, authController.login.bind(authController))
-  app.post("/logout", { schema: logoutSchema }, authController.logout.bind(authController))
-  app.post("/refresh", { schema: refreshTokenSchema }, refreshTokenController.handle.bind(refreshTokenController))
+  app.post("/login", { 
+    schema: loginSchema, 
+    config: { 
+      rateLimit: { 
+        max: 5, 
+        timeWindow: "1 minute"
+      } 
+    } 
+  }, authController.login.bind(authController))
+  
+  app.post("/logout", { 
+    schema: logoutSchema, 
+    config: {
+      rateLimit: {
+        max: 20,
+        timeWindow: "1 minute"
+      }
+    }
+  }, authController.logout.bind(authController))
+
+  app.post("/refresh", { 
+    schema: refreshTokenSchema, 
+    config: {
+      rateLimit: {
+        max: 20,
+        timeWindow: "1 minute",
+      }
+    }
+  }, refreshTokenController.handle.bind(refreshTokenController))
+
   app.get('/.well-known/jwks.json', { schema: jwksSchema }, getJwksController.handle.bind(getJwksController))
 }

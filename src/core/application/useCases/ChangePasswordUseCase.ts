@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt"
 import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository";
-import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
 import { UserNotFoundError } from "../../domain/erros/UserNotFoundError";
 import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
+import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
+import { User } from "../../domain/entities/User.entity";
 
 export class ChangePasswordUseCase {
     constructor(
@@ -17,15 +18,27 @@ export class ChangePasswordUseCase {
         newPassword :string
     ) :Promise<void> {
 
-        const user = await this.userQueryRepository.findUserWithPasswordById(userId)
+        const userPersistido = await this.userQueryRepository.findUserWithPasswordById(userId)
 
-        if(!user) {
+        if(!userPersistido) {
             throw new UserNotFoundError()
         }
 
+        const user = User.restore(
+            {
+                email: userPersistido.email,
+                password: userPersistido.password,
+                passwordChangeAt: userPersistido.passwordChangeAt,
+                passwordResetToken: userPersistido.passwordResetToken,
+                passwordResetExpiresAt: userPersistido.passwordResetExpiresAt,
+                deletedAt: userPersistido.deletedAt
+            },
+            userPersistido.id
+        )
+
         const passwordMatch = await bcrypt.compare(
             currentPassword,
-            user.password
+            user.getPassword()
         )
 
         if(!passwordMatch) {
@@ -34,9 +47,12 @@ export class ChangePasswordUseCase {
 
         const newPasswordHash = await this.hashService.hash(newPassword)
 
+        user.changePassword(newPasswordHash)
+
         await this.userRepository.updatePassword(
-            userId,
-            newPasswordHash
+            user.getId(), 
+            user.getPassword(),
+            user.getPasswordChangeAtOrThrow()
         )
     }
 }

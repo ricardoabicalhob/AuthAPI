@@ -14,11 +14,13 @@ export class UserController {
     private readonly deleteUserUseCase :DeleteUserUseCase
   ) {}
 
-  async create(request: FastifyRequest, reply: FastifyReply) {
-    const { email, password } = request.body as {
-      email: string
-      password: string
+  async create(request: FastifyRequest<{
+    Body: {
+      email :string
+      password :string
     }
+  }>, reply: FastifyReply) {
+    const { email, password } = request.body
 
     const user = await this.createUserUseCase.execute({
       email,

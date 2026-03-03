@@ -4,8 +4,12 @@ import { UserPrismaQueryRepository } from "../../database/UserPrismaRepository"
 import { UnauthorizedError } from "../../../core/domain/erros/UnauthorizedError"
 
 interface JwtPayload {
-    sub :string
-    iat :number
+    passwordChangeAt: Date,
+    iat: number,
+    exp: number,
+    aud: string,
+    iss: string,
+    sub: string
 }
 
 export async function authMiddleware(

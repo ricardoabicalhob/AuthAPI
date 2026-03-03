@@ -6,10 +6,12 @@ export class RefreshTokenController {
         private readonly refreshTokenUseCase :RefreshTokenUseCase
     ) {}
 
-    async handle(request :FastifyRequest, reply :FastifyReply) {
-        const { refreshToken } = request.body as {
+    async handle(request :FastifyRequest<{
+        Body: {
             refreshToken :string
         }
+    }>, reply :FastifyReply) {
+        const { refreshToken } = request.body
 
         const result = await this.refreshTokenUseCase.execute(refreshToken)
 

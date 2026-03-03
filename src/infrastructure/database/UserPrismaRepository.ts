@@ -3,30 +3,34 @@ import type { IUserQueryRepository, IUserRepository } from "../../interfaces/rep
 import { prismaClient } from "../../main/config/prisma-client";
 
 class UserPrismaRepository implements IUserRepository {
-    async create(email: string, passwordHash: string): Promise<UserResponseDTO> {
+    async create(id: string, email: string, passwordHash: string): Promise<UserResponseDTO> {
         const result = await prismaClient.user.create({
             data: {
+                id: id,
                 email: email,
                 password: passwordHash
             },
             select: {
                 id: true, 
                 email: true,
+                password: true,
                 passwordChangeAt: true,
+                passwordResetToken: true,
+                passwordResetExpiresAt: true,
                 deletedAt: true
             }
         })
         return result    
     }
 
-    async softDelete(userId: string): Promise<void> {
+    async softDelete(userId: string, passwordChangeAt :Date | null, deletedAt :Date | null): Promise<void> {
         await prismaClient.user.update({
             where: {
                 id: userId
             },
             data: {
-                deletedAt: new Date(),
-                passwordChangeAt: new Date()
+                deletedAt: deletedAt,
+                passwordChangeAt: passwordChangeAt
             }
         })
     }
@@ -43,28 +47,30 @@ class UserPrismaRepository implements IUserRepository {
         })
     }
 
-    async clearPasswordResetToken(userId: string): Promise<void> {
+    async clearPasswordResetToken(userId: string, passwordResetToken :string | null, passwordResetExpiresAt :Date | null): Promise<void> {
         await prismaClient.user.update({
             where: {
                 id: userId
             },
             data: {
-                passwordResetToken: null,
-                passwordResetExpiresAt: null
+                passwordResetToken: passwordResetToken,
+                passwordResetExpiresAt: passwordResetExpiresAt
             }
         })
     }
 
-    async updatePassword(userId: string, password: string): Promise<void> {
+    async updatePassword(
+        userId: string, 
+        password: string,
+        passwordChangeAt :Date
+    ): Promise<void> {
         await prismaClient.user.update({
             where: {
                 id: userId
             },
             data: {
                 password,
-                passwordResetToken: null,
-                passwordResetExpiresAt: null,
-                passwordChangeAt: new Date()
+                passwordChangeAt: passwordChangeAt
             }
         })
     }
@@ -79,7 +85,10 @@ class UserPrismaQueryRepository implements IUserQueryRepository {
             select: {
                 id: true,
                 email: true,
+                password: true,
                 passwordChangeAt: true,
+                passwordResetToken: true,
+                passwordResetExpiresAt: true,
                 deletedAt: true
             }
         })
@@ -94,20 +103,29 @@ class UserPrismaQueryRepository implements IUserQueryRepository {
             select: {
                 id: true, 
                 email: true,
+                password: true,
                 passwordChangeAt: true,
+                passwordResetToken: true,
+                passwordResetExpiresAt: true,
                 deletedAt: true
             }
         })
         return result
     }
 
-    async findByPasswordResetToken(tokenHash: string): Promise<{ id: string; } | null> {
+    async findByPasswordResetToken(tokenHash: string): Promise<UserResponseDTO | null> {
         const result = await prismaClient.user.findFirst({
             where: {
                 passwordResetToken: tokenHash
             },
             select: {
-                id: true
+                id: true,
+                email: true,
+                password: true,
+                passwordChangeAt: true,
+                passwordResetToken: true,
+                passwordResetExpiresAt: true,
+                deletedAt: true
             }
         })
         return result
@@ -127,7 +145,7 @@ class UserPrismaQueryRepository implements IUserQueryRepository {
         return result
     }
 
-    async findUserWithPasswordById(id: string): Promise<{ id: string; email: string; password: string; } | null> {
+    async findUserWithPasswordById(id: string): Promise<UserResponseDTO | null> {
         const result = await prismaClient.user.findFirst({
             where: {
                 id
@@ -135,7 +153,11 @@ class UserPrismaQueryRepository implements IUserQueryRepository {
             select: {
                 id: true,
                 email: true,
-                password: true
+                password: true,
+                passwordChangeAt: true,
+                passwordResetToken: true,
+                passwordResetExpiresAt: true,
+                deletedAt: true
             }
         })
         return result
