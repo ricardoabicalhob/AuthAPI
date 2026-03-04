@@ -4,6 +4,7 @@ import { UserNotFoundError } from "../../domain/erros/UserNotFoundError";
 import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
 import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
 import { User } from "../../domain/entities/User.entity";
+import { UserMapper } from "../mappers/UserMapper";
 
 export class ChangePasswordUseCase {
     constructor(
@@ -24,17 +25,7 @@ export class ChangePasswordUseCase {
             throw new UserNotFoundError()
         }
 
-        const user = User.restore(
-            {
-                email: userPersistido.email,
-                password: userPersistido.password,
-                passwordChangeAt: userPersistido.passwordChangeAt,
-                passwordResetToken: userPersistido.passwordResetToken,
-                passwordResetExpiresAt: userPersistido.passwordResetExpiresAt,
-                deletedAt: userPersistido.deletedAt
-            },
-            userPersistido.id
-        )
+        const user = UserMapper.toDomain(userPersistido)
 
         const passwordMatch = await bcrypt.compare(
             currentPassword,

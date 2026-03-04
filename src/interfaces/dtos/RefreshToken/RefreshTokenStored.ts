@@ -3,6 +3,6 @@ export interface RefreshTokenStored {
     userId :string
     tokenHash :string
     expiresAt :Date
-    revokeAt? :Date | null
+    revokedAt? :Date | null
     createdAt :Date
 }

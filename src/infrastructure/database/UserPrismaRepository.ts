@@ -24,15 +24,30 @@ class UserPrismaRepository implements IUserRepository {
     }
 
     async softDelete(userId: string, passwordChangeAt :Date | null, deletedAt :Date | null): Promise<void> {
-        await prismaClient.user.update({
-            where: {
-                id: userId
-            },
-            data: {
-                deletedAt: deletedAt,
-                passwordChangeAt: passwordChangeAt
-            }
-        })
+
+        const now = new Date()
+
+        await prismaClient.$transaction([
+            prismaClient.user.update({
+                where: {
+                    id: userId
+                },
+                data: {
+                    deletedAt: deletedAt,
+                    passwordChangeAt: passwordChangeAt
+                }
+            }),
+
+            prismaClient.refreshToken.updateMany({
+                where: {
+                    userId,
+                    revokedAt: null
+                },
+                data: {
+                    revokedAt: now
+                }
+            })
+        ])
     }
 
     async savePasswordResetToken(userId: string, tokenHash: string, expiresAt: Date): Promise<void> {
@@ -64,15 +79,30 @@ class UserPrismaRepository implements IUserRepository {
         password: string,
         passwordChangeAt :Date
     ): Promise<void> {
-        await prismaClient.user.update({
-            where: {
-                id: userId
-            },
-            data: {
-                password,
-                passwordChangeAt: passwordChangeAt
-            }
-        })
+
+        const now = new Date()
+        
+        await prismaClient.$transaction([
+            prismaClient.user.update({
+                where: {
+                    id: userId
+                },
+                data: {
+                    password,
+                    passwordChangeAt: passwordChangeAt
+                }
+            }),
+
+            prismaClient.refreshToken.updateMany({
+                where: {
+                    userId,
+                    revokedAt: null
+                },
+                data: {
+                    revokedAt: now
+                }
+            })
+        ])
     }
 }
 

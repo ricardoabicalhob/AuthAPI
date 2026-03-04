@@ -15,7 +15,7 @@ model User {
   passwordChangeAt       DateTime?
   deletedAt              DateTime?
 
-  refresTokens RefreshToken[]
+  refreshTokens RefreshToken[]
 }
 
 model RefreshToken {

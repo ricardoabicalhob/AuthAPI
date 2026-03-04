@@ -3,6 +3,7 @@ import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
 import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
 import type { TokenHashService } from "../../domain/services/TokenHashService";
 import { User } from "../../domain/entities/User.entity";
+import { UserMapper } from "../mappers/UserMapper";
 
 export class ResetPasswordUseCase {
     constructor(
@@ -21,17 +22,7 @@ export class ResetPasswordUseCase {
             throw new UnauthorizedError()
         }
 
-        const user = User.restore(
-            {
-                email: userPersistido.email,
-                password: userPersistido.password,
-                passwordChangeAt: userPersistido.passwordChangeAt,
-                passwordResetToken: userPersistido.passwordResetToken,
-                passwordResetExpiresAt: userPersistido.passwordResetExpiresAt,
-                deletedAt: userPersistido.deletedAt
-            },
-            userPersistido.id
-        )
+        const user = UserMapper.toDomain(userPersistido)
 
         const passwordHash = await this.hashService.hash(newPassword)
 

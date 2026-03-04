@@ -21,6 +21,18 @@ class RefreshTokenPrismaRepository implements IRefreshTokenRepository {
             }
         })
     }
+
+    async revokeAllByUserId(userId: string): Promise<void> {
+        await prismaClient.refreshToken.updateMany({
+            where: {
+                userId,
+                revokedAt: null
+            },
+            data: {
+                revokedAt: new Date()
+            }
+        })
+    }
 }
 
 class RefreshTokenPrismaQueryRepository implements IRefreshTokenQueryRepository {
@@ -36,7 +48,7 @@ class RefreshTokenPrismaQueryRepository implements IRefreshTokenQueryRepository 
             userId: token.userId,
             tokenHash: token.tokenHash,
             expiresAt: token.expiresAt,
-            revokeAt: token.revokedAt,
+            revokedAt: token.revokedAt,
             createdAt: token.createdAt
         }
     }

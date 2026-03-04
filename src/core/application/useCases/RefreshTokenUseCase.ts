@@ -1,9 +1,9 @@
-import crypto from "crypto"
 import type { IUserQueryRepository } from "../../../interfaces/repositories/UserRepository";
 import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
 import { UserNotFoundError } from "../../domain/erros/UserNotFoundError";
 import type { TokenService } from "../../domain/services/TokenService";
 import type { IRefreshTokenQueryRepository, IRefreshTokenRepository } from "../../../interfaces/repositories/RefreshTokenRepository";
+import { UserMapper } from "../mappers/UserMapper";
 
 export class RefreshTokenUseCase {
     constructor(
@@ -20,36 +20,38 @@ export class RefreshTokenUseCase {
 
         if(
             !storedToken ||
-            storedToken.revokeAt ||
+            storedToken.revokedAt ||
             storedToken.expiresAt < new Date()
         ) {
             throw new UnauthorizedError()
         }
 
-        const user = await this.userQueryRepository.findById(storedToken.userId)
+        const userPersistido = await this.userQueryRepository.findById(storedToken.userId)
 
-        if(!user) {
+        if(!userPersistido) {
             throw new UserNotFoundError()
         }
 
         if(
-            user.passwordChangeAt &&
-            storedToken.createdAt < user.passwordChangeAt
+            userPersistido.passwordChangeAt &&
+            storedToken.createdAt < userPersistido.passwordChangeAt
         ) {
             throw new UnauthorizedError()
         }
 
+        const user = UserMapper.toDomain(userPersistido)
+
         await this.refreshTokenRepository.revoke(storedToken.id)
 
         const accessToken = this.tokenService.generateAccessToken(
-            user.id,
-            user.passwordChangeAt
+            user.getId(),
+            user.getPasswordChangeAt()
         )
 
         const { token, hash: newHash, expiresAt } = this.tokenService.generateRefreshToken()
 
         await this.refreshTokenRepository.create({
-            userId: user.id,
+            userId: user.getId(),
             tokenHash: newHash,
             expiresAt
         })

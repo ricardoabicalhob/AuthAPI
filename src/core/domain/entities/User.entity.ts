@@ -63,8 +63,8 @@ export class User {
     return this.props.passwordResetToken
   }
 
-  getPasswordResetTokenOrThrow(): string {
-    if(!this.props.passwordResetToken) {
+  getPasswordResetTokenOrThrow(): string | null {
+    if(this.props.passwordResetToken === undefined) {
         throw new Error("Password reset token not defined")
     }
 
@@ -75,8 +75,8 @@ export class User {
     return this.props.passwordResetExpiresAt
   }
 
-  getPasswordResetExpiresAtOrThrow() :Date {
-    if(!this.props.passwordResetExpiresAt) {
+  getPasswordResetExpiresAtOrThrow() :Date | null{
+    if(this.props.passwordResetExpiresAt === undefined) {
         throw new Error("Password expires date not defined")
     }
 
