@@ -1,0 +1,1 @@
+{"version":3,"file":"UnauthorizedError.d.ts","sourceRoot":"","sources":["../../../../src/core/domain/erros/UnauthorizedError.ts"],"names":[],"mappings":"AAAA,qBAAa,iBAAkB,SAAQ,KAAK;IAC1C,SAAgB,UAAU,OAAM;gBAEpB,OAAO,SAAmB;CAIvC"}

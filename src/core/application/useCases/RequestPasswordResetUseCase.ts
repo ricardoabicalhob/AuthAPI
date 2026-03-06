@@ -25,7 +25,7 @@ export class RequestPasswordResetUseCase {
             expiresAt
         )
 
-        const resetLink = `http://localhost:5173?token=${token}`
+        const resetLink = process.env.FRONTEND_URL + `?token=${token}` || `http://localhost:5173?token=${token}`
 
         await this.mailService.sendPasswordReset(
             user.email,

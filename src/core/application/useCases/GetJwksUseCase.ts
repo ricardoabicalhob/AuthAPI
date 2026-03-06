@@ -1,5 +1,4 @@
 import { exportJWK } from "jose"
-import { createPublicKey } from "crypto"
 import { getPublicKey } from "../../../utils/keys"
 
 export class GetJwksUseCase {

@@ -4,11 +4,13 @@ import { UserPrismaQueryRepository } from "../../database/UserPrismaRepository"
 import { UnauthorizedError } from "../../../core/domain/erros/UnauthorizedError"
 
 interface JwtPayload {
-    passwordChangeAt: Date,
-    iat: number,
-    exp: number,
-    aud: string,
-    iss: string,
+    name :string
+    email :string
+    passwordChangeAt: Date
+    iat: number
+    exp: number
+    aud: string
+    iss: string
     sub: string
 }
 
@@ -33,21 +35,21 @@ export async function authMiddleware(
         const decoded = tokenService.verifyAccessToken(token) as JwtPayload
 
         const userQueryRepository = new UserPrismaQueryRepository()
-        const user = await userQueryRepository.findById(decoded.sub)
+        const userPersistido = await userQueryRepository.findById(decoded.sub)
 
-        if(!user || user.deletedAt) {
+        if(!userPersistido || userPersistido.deletedAt) {
             throw new UnauthorizedError()
         }
 
         if(
-            user.passwordChangeAt &&
-            decoded.iat * 1000 < user.passwordChangeAt.getTime()
+            userPersistido.passwordChangeAt &&
+            decoded.iat * 1000 < userPersistido.passwordChangeAt.getTime()
         ) {
             throw new UnauthorizedError()
         }
 
         request.user = {
-            id: user.id
+            id: userPersistido.id
         }
 
     } catch (error) {

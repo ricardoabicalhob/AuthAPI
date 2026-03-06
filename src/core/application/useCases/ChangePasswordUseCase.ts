@@ -3,7 +3,6 @@ import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/
 import { UserNotFoundError } from "../../domain/erros/UserNotFoundError";
 import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
 import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
-import { User } from "../../domain/entities/User.entity";
 import { UserMapper } from "../mappers/UserMapper";
 
 export class ChangePasswordUseCase {

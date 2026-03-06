@@ -45,6 +45,8 @@ export class RefreshTokenUseCase {
 
         const accessToken = this.tokenService.generateAccessToken(
             user.getId(),
+            user.getName(),
+            user.getEmail(),
             user.getPasswordChangeAt()
         )
 

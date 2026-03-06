@@ -29,7 +29,8 @@ async function bootstrap() {
     app.register(cors, {
         origin: (origin, callback) => {
             const allowedOrigins = [
-                env.FRONTEND_URL
+                env.FRONTEND_URL,
+                'http://localhost:5173'
             ]
 
             if(!origin || allowedOrigins.includes(origin)) {

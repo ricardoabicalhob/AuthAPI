@@ -3,16 +3,18 @@ import type { IUserQueryRepository, IUserRepository } from "../../interfaces/rep
 import { prismaClient } from "../../main/config/prisma-client";
 
 class UserPrismaRepository implements IUserRepository {
-    async create(id: string, email: string, passwordHash: string): Promise<UserResponseDTO> {
+    async create(id: string, email: string, name :string, passwordHash: string): Promise<UserResponseDTO> {
         const result = await prismaClient.user.create({
             data: {
                 id: id,
                 email: email,
+                name: name,
                 password: passwordHash
             },
             select: {
                 id: true, 
                 email: true,
+                name: true,
                 password: true,
                 passwordChangeAt: true,
                 passwordResetToken: true,
@@ -115,6 +117,7 @@ class UserPrismaQueryRepository implements IUserQueryRepository {
             select: {
                 id: true,
                 email: true,
+                name: true,
                 password: true,
                 passwordChangeAt: true,
                 passwordResetToken: true,
@@ -133,6 +136,7 @@ class UserPrismaQueryRepository implements IUserQueryRepository {
             select: {
                 id: true, 
                 email: true,
+                name: true,
                 password: true,
                 passwordChangeAt: true,
                 passwordResetToken: true,
@@ -151,25 +155,12 @@ class UserPrismaQueryRepository implements IUserQueryRepository {
             select: {
                 id: true,
                 email: true,
+                name: true,
                 password: true,
                 passwordChangeAt: true,
                 passwordResetToken: true,
                 passwordResetExpiresAt: true,
                 deletedAt: true
-            }
-        })
-        return result
-    }
-
-    async findUserWithPasswordByEmail(email: string): Promise<{ id: string, email :string, password: string } | null> {
-        const result = await prismaClient.user.findFirst({
-            where: {
-                email
-            },
-            select: {
-                id: true,
-                email: true,
-                password: true
             }
         })
         return result
@@ -183,6 +174,7 @@ class UserPrismaQueryRepository implements IUserQueryRepository {
             select: {
                 id: true,
                 email: true,
+                name: true,
                 password: true,
                 passwordChangeAt: true,
                 passwordResetToken: true,

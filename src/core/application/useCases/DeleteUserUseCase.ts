@@ -1,6 +1,4 @@
-import type { IRefreshTokenRepository } from "../../../interfaces/repositories/RefreshTokenRepository"
 import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository"
-import { User } from "../../domain/entities/User.entity"
 import { UserNotFoundError } from "../../domain/erros/UserNotFoundError"
 import { UserMapper } from "../mappers/UserMapper"
 
@@ -8,7 +6,6 @@ export class DeleteUserUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly userQueryRepository :IUserQueryRepository,
-    private readonly refresTokenRepository :IRefreshTokenRepository
   ) {}
 
   async execute(userId: string): Promise<void> {

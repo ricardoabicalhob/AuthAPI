@@ -1,8 +1,10 @@
 import { randomUUID } from "node:crypto"
+import { NameNormalizado } from "../value-objects/NameNormalizado"
 
 type UserProps = {
   email: string
   password: string
+  name: NameNormalizado
   passwordResetToken?: string | null
   passwordResetExpiresAt?: Date | null
   passwordChangeAt?: Date | null
@@ -33,6 +35,10 @@ export class User {
 
   getPassword() {
     return this.props.password
+  }
+
+  getName() {
+    return this.props.name.getValue()
   }
 
   getPasswordChangeAt() {

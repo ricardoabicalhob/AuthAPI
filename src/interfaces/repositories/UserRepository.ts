@@ -1,7 +1,7 @@
 import type { UserResponseDTO } from "../dtos/User/UserResponseDTO";
 
 interface IUserRepository {
-    create(id: string, email :string, passwordHash :string) :Promise<UserResponseDTO>
+    create(id: string, email :string, name :string, passwordHash :string) :Promise<UserResponseDTO>
     softDelete(
         userId :string,
         passwordChangeAt :Date | null, 
@@ -24,9 +24,7 @@ interface IUserQueryRepository {
     findById(id :string) :Promise<UserResponseDTO | null>
     findByEmail(email :string) :Promise<UserResponseDTO | null>
     findByPasswordResetToken(token :string) :Promise<UserResponseDTO | null>
-    findUserWithPasswordByEmail(email :string) :Promise<{ id :string, email :string, password :string } | null>
     findUserWithPasswordById(id :string) :Promise<UserResponseDTO | null>
-    // findUserWithPasswordById(id :string) :Promise<{ id :string, email :string, password :string } | null>
 }
 
 export type { IUserRepository, IUserQueryRepository }

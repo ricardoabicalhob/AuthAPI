@@ -5,6 +5,8 @@ import type { TokenService } from "../../domain/services/TokenService";
 import { InvalidCredentialsError } from "../../domain/erros/InvalidCredentialError";
 import { UserNotFoundError } from "../../domain/erros/UserNotFoundError";
 import type { IRefreshTokenRepository } from "../../../interfaces/repositories/RefreshTokenRepository";
+import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
+import { UserMapper } from "../mappers/UserMapper";
 
 export class LoginUseCase {
     constructor(
@@ -14,36 +16,37 @@ export class LoginUseCase {
     ) {}
 
     async execute(email :string, password :string) :Promise<LoginResponseDTO> {
-        const user = await this.userQueryRepository.findByEmail(email)
+        const userPersistido = await this.userQueryRepository.findByEmail(email)
 
-        if(!user) {
-            throw new InvalidCredentialsError()
+        if(!userPersistido) {
+            throw new UnauthorizedError()
         }
 
-        if(user.deletedAt !== null) {
+        if(userPersistido.deletedAt !== null) {
             throw new UserNotFoundError()
         }
 
-        const userWithPassword = await this.userQueryRepository.findUserWithPasswordByEmail(email)
-
-        if(!userWithPassword) {
-            throw new InvalidCredentialsError()
-        }
+        const user = UserMapper.toDomain(userPersistido)
 
         const passwordIsValid = await bcrypt.compare(
             password,
-            userWithPassword.password
+            user.getPassword()
         )
 
         if(!passwordIsValid) {
             throw new InvalidCredentialsError()
         }
 
-        const accessToken = this.tokenService.generateAccessToken(user.id)
+        const accessToken = this.tokenService.generateAccessToken(
+            user.getId(),
+            user.getName(),
+            user.getEmail(),
+            user.getPasswordChangeAt()
+        )
 
         const { token, hash, expiresAt } = this.tokenService.generateRefreshToken()
         await this.refreshTokenRepository.create({
-            userId: user.id,
+            userId: user.getId(),
             tokenHash: hash,
             expiresAt
         })

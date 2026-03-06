@@ -2,7 +2,6 @@ import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/
 import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
 import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
 import type { TokenHashService } from "../../domain/services/TokenHashService";
-import { User } from "../../domain/entities/User.entity";
 import { UserMapper } from "../mappers/UserMapper";
 
 export class ResetPasswordUseCase {

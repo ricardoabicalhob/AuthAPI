@@ -47,7 +47,7 @@ export function makeUserController() {
 
   const deleteUserUseCase = new DeleteUserUseCase(
     userRepository,
-    userQueryRepository
+    userQueryRepository,
   )
 
   return new UserController(

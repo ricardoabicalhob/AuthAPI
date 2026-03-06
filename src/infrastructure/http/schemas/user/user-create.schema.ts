@@ -7,11 +7,14 @@ export const userCreateSchema: FastifySchema = {
 
   body: {
     type: "object",
-    required: ["email", "password"],
+    required: ["email", "name", "password"],
     properties: {
       email: {
         type: "string",
         format: "email",
+      },
+      name: {
+        type: "string"
       },
       password: {
         type: "string",
@@ -34,6 +37,10 @@ export const userCreateSchema: FastifySchema = {
           type: "string",
           format: "email",
           example: "user@email.com"
+        },
+        name: {
+          type: "string",
+          example: "Nome do usuário"
         }
       }
     },

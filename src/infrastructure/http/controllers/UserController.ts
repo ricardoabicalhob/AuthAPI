@@ -17,13 +17,15 @@ export class UserController {
   async create(request: FastifyRequest<{
     Body: {
       email :string
+      name :string
       password :string
     }
   }>, reply: FastifyReply) {
-    const { email, password } = request.body
+    const { email, name, password } = request.body
 
     const user = await this.createUserUseCase.execute({
       email,
+      name,
       password
     })
 

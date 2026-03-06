@@ -1,0 +1,35 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: auth_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authpass
+      POSTGRES_DB: authdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  auth-api:
+    build: .
+    container_name: auth_api
+    depends_on:
+      - postgres
+    ports:
+      - "3100:3100"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://authuser:authpass@postgres:5432/authdb?schema=public
+      PORT: 3100
+    command: >
+      sh -c "
+      npx prisma migrate deploy &&
+      npx tsx src/main/server.ts
+      "
+
+volumes:
+  postgres_data:

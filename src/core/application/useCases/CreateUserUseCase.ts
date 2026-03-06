@@ -3,6 +3,7 @@ import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/
 import { User } from "../../domain/entities/User.entity";
 import { EmailAlreadyRegisteredError } from "../../domain/erros/EmailAlreadyRegisteredError";
 import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
+import { NameNormalizado } from "../../domain/value-objects/NameNormalizado";
 
 export class CreateUserUseCase {
     constructor(
@@ -22,12 +23,14 @@ export class CreateUserUseCase {
 
         const user = User.create({
             email: data.email,
+            name: new NameNormalizado(data.name),
             password: passwordHash
         })
 
         const userCreated = await this.userRepository.create(
             user.getId(),
             user.getEmail(),
+            user.getName(),
             user.getPassword()
         )
 

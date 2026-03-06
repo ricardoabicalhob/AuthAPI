@@ -1,11 +1,11 @@
-import nodemailer from "nodemailer"
+import { createTransport } from "nodemailer"
 
 export class MailService {
     private transporter
 
     constructor() {
         // Configuração do SMTP via variáveis de ambiente
-        this.transporter = nodemailer.createTransport({
+        this.transporter = createTransport({
             host: process.env.SMTP_HOST,
             port: Number(process.env.SMTP_PORT),
             secure: false, // true para porta 465

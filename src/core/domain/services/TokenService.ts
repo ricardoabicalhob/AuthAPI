@@ -1,4 +1,4 @@
-import crypto from "crypto"
+import { randomBytes, createHash } from "crypto"
 import jwt from "jsonwebtoken"
 import { getPrivateKey, getPublicKey } from "../../../utils/keys"
 
@@ -16,9 +16,11 @@ export class TokenService {
     private privateKey = getPrivateKey()
     private publicKey = getPublicKey()
 
-    generateAccessToken(userId :string, passwordChangeAt? :Date | null) {
+    generateAccessToken(userId :string, name :string, email :string, passwordChangeAt? :Date | null) {
         return jwt.sign(
             {
+                name,
+                email,
                 passwordChangeAt: passwordChangeAt
                     ? Math.floor(passwordChangeAt.getTime() / 1000)
                     : undefined
@@ -28,7 +30,7 @@ export class TokenService {
                 algorithm: "RS256",
                 subject: userId,
                 expiresIn: "15m",
-                issuer: "http://localhost:3100",
+                issuer: "https://api-authapi.ricardodev.cloud",
                 audience: "sgra-api",
                 keyid: "auth-key-1"
             }
@@ -36,12 +38,11 @@ export class TokenService {
     }
 
     generateRefreshToken() {
-        const token = crypto.randomBytes(40).toString("hex")
+        const token = randomBytes(40).toString("hex")
 
-        const hash = crypto
-            .createHash("sha256")
-            .update(token)
-            .digest("hex")
+        const hash = createHash("sha256")
+                    .update(token)
+                    .digest("hex")
 
         return {
             token, 
@@ -53,21 +54,20 @@ export class TokenService {
     verifyAccessToken(token :string) {
         return jwt.verify(token, this.publicKey, {
             algorithms: ["RS256"],
-            issuer: "http://localhost:3100",
+            issuer: "https://api-authapi.ricardodev.cloud",
             audience: "sgra-api"
         }) as JwtPayload
     }
 
     hashToken(token: string) {
-        return crypto
-            .createHash("sha256")
-            .update(token)
-            .digest("hex")
+        return createHash("sha256")
+                .update(token)
+                .digest("hex")
     }
 
     generateResetToken() {
-        const token = crypto.randomBytes(32).toString('hex')
-        const hash = crypto.createHash("sha256").update(token).digest("hex")
+        const token = randomBytes(32).toString('hex')
+        const hash = createHash("sha256").update(token).digest("hex")
         
         return { token, hash }
     }
