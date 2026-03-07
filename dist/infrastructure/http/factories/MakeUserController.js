@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.makeUserController = makeUserController;
-const UserPasswordHashService_1 = require("../../../core/domain/services/UserPasswordHashService");
+const PasswordHasher_1 = require("../../../core/domain/services/PasswordHasher");
 const MailService_1 = require("../../../core/domain/services/MailService");
 const TokenHashService_1 = require("../../../core/domain/services/TokenHashService");
 const TokenService_1 = require("../../../core/domain/services/TokenService");
@@ -15,7 +15,7 @@ const UserController_1 = require("../controllers/UserController");
 function makeUserController() {
     const userRepository = new UserPrismaRepository_1.UserPrismaRepository();
     const userQueryRepository = new UserPrismaRepository_1.UserPrismaQueryRepository();
-    const hashService = new UserPasswordHashService_1.UserPasswordHashService();
+    const hashService = new PasswordHasher_1.PasswordHasher();
     const tokenHashService = new TokenHashService_1.TokenHashService();
     const mailService = new MailService_1.MailService();
     const tokenService = new TokenService_1.TokenService();

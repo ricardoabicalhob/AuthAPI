@@ -1,4 +1,5 @@
 node_modules
+dist
 private.pem
 public.pem
 .env
