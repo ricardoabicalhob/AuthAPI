@@ -46,9 +46,9 @@ Este projeto foi estruturado seguindo a **Clean Architecture**, separando respon
 | Método | Rota | Descrição | Auth Required |
 | :--- | :--- | :--- | :---: |
 | `POST` | `/usuarios` | Cria um novo usuário | ❌ |
-| `POST` | `/auth/login` | Realiza login e retorna tokens | ❌ |
-| `POST` | `/auth/refresh` | Gera um novo Access Token | ❌ |
-| `GET` | `/auth/.well-known/jwks.json` | Obtém a public key para verificação do access token | ❌ |
+| `POST` | `/auth/login` | Realiza login e retorna Access Token e Refresh Token | ❌ |
+| `POST` | `/auth/refresh` | Gera novo Access Token e novo Refresh Token | ❌ |
+| `GET` | `/auth/.well-known/jwks.json` | Obtém a public key para verificação do Access Token | ❌ |
 | `PATCH` | `/usuarios/password/change` | Altera a senha (logado) | ✅ |
 | `POST` | `/usuarios/password/forgot` | Solicita token de reset | ❌ |
 | `POST` | `/usuarios/password/reset` | Redefine senha via token | ❌ |
