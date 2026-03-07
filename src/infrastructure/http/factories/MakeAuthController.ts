@@ -4,7 +4,7 @@ import { UserPrismaQueryRepository } from "../../database/UserPrismaRepository"
 import { TokenService } from "../../../core/domain/services/TokenService"
 import { RefreshTokenPrismaQueryRepository, RefreshTokenPrismaRepository } from "../../database/RefreshTokenPrismaRepository"
 import { LogoutUseCase } from "../../../core/application/useCases/LogoutUseCase"
-import { UserPasswordHashService } from "../../../core/domain/services/UserPasswordHashService"
+import { PasswordHasher } from "../../../core/domain/services/PasswordHasher"
 import { TokenHashService } from "../../../core/domain/services/TokenHashService"
 
 export function makeAuthController() {

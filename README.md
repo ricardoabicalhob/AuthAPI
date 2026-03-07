@@ -6,7 +6,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Vitest](https://img.shields.io/badge/-Vitest-729B1B?style=for-the-badge&logo=vitest&logoColor=white)
 
-API de autenticação e gerenciamento de usuários desenvolvida com foco em segurança, performance e escalabilidade. O projeto aplica os princípios da **Clean Architecture**, garantindo um código testável e de fácil manutenção.
+API de autenticação e gerenciamento de usuários desenvolvida com foco em segurança, desempenho e escalabilidade. Este projeto foi concebido como um estudo de **Clean Architecture** e aplica diversos **padrões táticos de Design Orientado a Domínio**, como Use Cases, Value Objects e Repository Pattern.
 
 ---
 
@@ -43,18 +43,64 @@ Este projeto foi estruturado seguindo a **Clean Architecture**, separando respon
 
 ## 🔑 Endpoints
 
-| Método | Rota | Descrição | Protegida? |
+| Método | Rota | Descrição | Auth Required |
 | :--- | :--- | :--- | :---: |
 | `POST` | `/usuarios` | Cria um novo usuário | ❌ |
 | `POST` | `/auth/login` | Realiza login e retorna tokens | ❌ |
 | `POST` | `/auth/refresh` | Gera um novo Access Token | ❌ |
-| `GET` | `/auth/.well-known/jwks.json` | Obtém a private key para verificação do access token | ❌ |
+| `GET` | `/auth/.well-known/jwks.json` | Obtém a public key para verificação do access token | ❌ |
 | `PATCH` | `/usuarios/password/change` | Altera a senha (logado) | ✅ |
 | `POST` | `/usuarios/password/forgot` | Solicita token de reset | ❌ |
 | `POST` | `/usuarios/password/reset` | Redefine senha via token | ❌ |
 | `DELETE` | `/usuarios` | Remove a conta do usuário | ✅ | 
 
 > **Documentação Completa:** Com o servidor rodando, acesse `http://localhost:3100/docs`
+
+---
+
+## 📦 Estrutura do Projeto
+```bash
+src
+ ├ domain
+ │  ├ entities
+ │  ├ value-objects
+ │  └ errors
+ │
+ ├ application
+ │  └ usecases
+ │
+ ├ infra
+ │  ├ database
+ │  └ repositories
+ │
+ └ main
+ ```
+
+## 🏗️ Visão Geral da Arquitetura
+```mermaid
+flowchart LR
+
+Client[Client Application]
+
+Controller[HTTP Controllers]
+
+UseCases[Application Use Cases]
+
+Domain[Domain Layer\nEntities & Value Objects]
+
+Repository[Repository Interface]
+
+PrismaRepo[Prisma Repository]
+
+Database[(PostgreSQL)]
+
+Client --> Controller
+Controller --> UseCases
+UseCases --> Domain
+UseCases --> Repository
+Repository --> PrismaRepo
+PrismaRepo --> Database
+```
 
 ---
 

@@ -2,14 +2,15 @@ import type { CreateUserDTO } from "../../../interfaces/dtos/User/CreateUserDTO"
 import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository";
 import { User } from "../../domain/entities/User.entity";
 import { EmailAlreadyRegisteredError } from "../../domain/erros/EmailAlreadyRegisteredError";
-import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
+import type { PasswordHasher } from "../../domain/services/PasswordHasher";
 import { NameNormalizado } from "../../domain/value-objects/NameNormalizado";
+import { Password } from "../../domain/value-objects/Password";
 
 export class CreateUserUseCase {
     constructor(
         private readonly userRepository :IUserRepository,
         private readonly userQueryRepository :IUserQueryRepository,
-        private readonly hashService :UserPasswordHashService
+        private readonly hashService :PasswordHasher
     ) {}
 
     async execute(data :CreateUserDTO) {
@@ -19,7 +20,9 @@ export class CreateUserUseCase {
             throw new EmailAlreadyRegisteredError()
         }
 
-        const passwordHash = await this.hashService.hash(data.password)
+        const passwordPlain = Password.create(data.password)
+
+        const passwordHash = await this.hashService.hash(passwordPlain.getValue())
 
         const user = User.create({
             email: data.email,

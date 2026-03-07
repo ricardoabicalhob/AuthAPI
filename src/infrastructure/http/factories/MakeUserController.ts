@@ -1,4 +1,4 @@
-import { UserPasswordHashService } from "../../../core/domain/services/UserPasswordHashService"
+import { PasswordHasher } from "../../../core/domain/services/PasswordHasher"
 import { MailService } from "../../../core/domain/services/MailService"
 import { TokenHashService } from "../../../core/domain/services/TokenHashService"
 import { TokenService } from "../../../core/domain/services/TokenService"
@@ -14,7 +14,7 @@ export function makeUserController() {
   const userRepository = new UserPrismaRepository()
   const userQueryRepository = new UserPrismaQueryRepository()
 
-  const hashService = new UserPasswordHashService()
+  const hashService = new PasswordHasher()
   const tokenHashService = new TokenHashService()
   const mailService = new MailService()
   const tokenService = new TokenService()

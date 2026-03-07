@@ -2,14 +2,14 @@ import bcrypt from "bcrypt"
 import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository";
 import { UserNotFoundError } from "../../domain/erros/UserNotFoundError";
 import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
-import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
+import type { PasswordHasher } from "../../domain/services/PasswordHasher";
 import { UserMapper } from "../mappers/UserMapper";
 
 export class ChangePasswordUseCase {
     constructor(
         private readonly userRepository :IUserRepository,
         private readonly userQueryRepository :IUserQueryRepository,
-        private readonly hashService :UserPasswordHashService
+        private readonly hashService :PasswordHasher
     ) {}
 
     async execute(

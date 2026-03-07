@@ -1,6 +1,6 @@
 import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository";
 import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
-import type { UserPasswordHashService } from "../../domain/services/UserPasswordHashService";
+import type { PasswordHasher } from "../../domain/services/PasswordHasher";
 import type { TokenHashService } from "../../domain/services/TokenHashService";
 import { UserMapper } from "../mappers/UserMapper";
 
@@ -8,7 +8,7 @@ export class ResetPasswordUseCase {
     constructor(
         private readonly userRepository :IUserRepository,
         private readonly userQueryRepository :IUserQueryRepository,
-        private readonly hashService :UserPasswordHashService,
+        private readonly hashService :PasswordHasher,
         private readonly tokenHashService :TokenHashService
     ) {}
 

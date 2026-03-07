@@ -1,15 +1,18 @@
+import { NameMinimumCharacterLimitError } from "../erros/NameMinimumCharacterLimitError"
+import { NameIsRequiredError } from "../erros/NameIsRequiredError"
+
 export class NameNormalizado {
     private readonly value :string
 
     constructor(name :string) {
         if(!name) {
-            throw new Error("Nome é requerido")
+            throw new NameIsRequiredError()
         }
 
         const normalizado = name.trim().toUpperCase()
 
         if(normalizado.length < 3) {
-            throw new Error("O nome deve possuir no mínimo 3 caracteres")
+            throw new NameMinimumCharacterLimitError()
         }
 
         this.value = normalizado
