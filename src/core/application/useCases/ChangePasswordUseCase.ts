@@ -2,8 +2,10 @@ import bcrypt from "bcrypt"
 import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/repositories/UserRepository";
 import { UserNotFoundError } from "../../domain/erros/UserNotFoundError";
 import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
-import type { PasswordHasher } from "../../domain/services/PasswordHasher";
+import { PasswordHasher } from "../../domain/services/PasswordHasher";
 import { UserMapper } from "../mappers/UserMapper";
+import { PasswordHash } from "../../domain/value-objects/PasswordHash";
+import { Password } from "../../domain/value-objects/Password";
 
 export class ChangePasswordUseCase {
     constructor(
@@ -35,7 +37,11 @@ export class ChangePasswordUseCase {
             throw new UnauthorizedError()
         }
 
-        const newPasswordHash = await this.hashService.hash(newPassword)
+        const newPasswordPlain = Password.create(newPassword)
+
+        const newHash = await this.hashService.hash(newPasswordPlain.getValue())
+
+        const newPasswordHash = PasswordHash.create(newHash)
 
         user.changePassword(newPasswordHash)
 

@@ -3,8 +3,10 @@ import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/
 import { User } from "../../domain/entities/User.entity";
 import { EmailAlreadyRegisteredError } from "../../domain/erros/EmailAlreadyRegisteredError";
 import type { PasswordHasher } from "../../domain/services/PasswordHasher";
-import { NameNormalizado } from "../../domain/value-objects/NameNormalizado";
+import { Email } from "../../domain/value-objects/Email";
+import { NormalizedName } from "../../domain/value-objects/NameNormalizado";
 import { Password } from "../../domain/value-objects/Password";
+import { PasswordHash } from "../../domain/value-objects/PasswordHash";
 
 export class CreateUserUseCase {
     constructor(
@@ -20,13 +22,17 @@ export class CreateUserUseCase {
             throw new EmailAlreadyRegisteredError()
         }
 
-        const passwordPlain = Password.create(data.password)
+        const email = Email.create(data.email)
+        const name = NormalizedName.create(data.name)
+        const password = Password.create(data.password)
 
-        const passwordHash = await this.hashService.hash(passwordPlain.getValue())
+        const hash = await this.hashService.hash(password.getValue())
+
+        const passwordHash = PasswordHash.create(hash)
 
         const user = User.create({
-            email: data.email,
-            name: new NameNormalizado(data.name),
+            email: email,
+            name: name,
             password: passwordHash
         })
 

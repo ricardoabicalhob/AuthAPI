@@ -1,10 +1,12 @@
 import { randomUUID } from "node:crypto"
-import { NameNormalizado } from "../value-objects/NameNormalizado"
+import { NormalizedName } from "../value-objects/NameNormalizado"
+import { Email } from "../value-objects/Email"
+import { PasswordHash } from "../value-objects/PasswordHash"
 
 type UserProps = {
-  email: string
-  password: string
-  name: NameNormalizado
+  email: Email
+  password: PasswordHash
+  name: NormalizedName
   passwordResetToken?: string | null
   passwordResetExpiresAt?: Date | null
   passwordChangeAt?: Date | null
@@ -30,11 +32,11 @@ export class User {
   }
 
   getEmail() {
-    return this.props.email
+    return this.props.email.getValue()
   }
 
   getPassword() {
-    return this.props.password
+    return this.props.password.getValue()
   }
 
   getName() {
@@ -89,7 +91,7 @@ export class User {
     return this.props.passwordResetExpiresAt
   }
 
-  changePassword(newPasswordHash: string) {
+  changePassword(newPasswordHash: PasswordHash) {
     this.props.password = newPasswordHash
     this.clearPasswordResetToken()
     this.markPasswordChanged()

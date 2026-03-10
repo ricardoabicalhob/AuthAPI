@@ -2,6 +2,8 @@ import type { IUserQueryRepository, IUserRepository } from "../../../interfaces/
 import { UnauthorizedError } from "../../domain/erros/UnauthorizedError";
 import type { PasswordHasher } from "../../domain/services/PasswordHasher";
 import type { TokenHashService } from "../../domain/services/TokenHashService";
+import { Password } from "../../domain/value-objects/Password";
+import { PasswordHash } from "../../domain/value-objects/PasswordHash";
 import { UserMapper } from "../mappers/UserMapper";
 
 export class ResetPasswordUseCase {
@@ -23,7 +25,11 @@ export class ResetPasswordUseCase {
 
         const user = UserMapper.toDomain(userPersistido)
 
-        const passwordHash = await this.hashService.hash(newPassword)
+        const newPasswordPlain = Password.create(newPassword)
+
+        const hash = await this.hashService.hash(newPasswordPlain.getValue())
+
+        const passwordHash = PasswordHash.create(hash)
 
         user.changePassword(passwordHash)
         user.clearPasswordResetToken()

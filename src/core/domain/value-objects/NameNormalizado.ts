@@ -1,28 +1,33 @@
 import { NameMinimumCharacterLimitError } from "../erros/NameMinimumCharacterLimitError"
 import { NameIsRequiredError } from "../erros/NameIsRequiredError"
 
-export class NameNormalizado {
+export class NormalizedName {
     private readonly value :string
 
-    constructor(name :string) {
-        if(!name) {
+    private constructor(value :string) {
+        this.value = value
+    }
+
+    static create(value :string) {
+        if(!value) {
             throw new NameIsRequiredError()
         }
 
-        const normalizado = name.trim().toUpperCase()
+        const normalizado = value.trim().toUpperCase()
 
         if(normalizado.length < 3) {
             throw new NameMinimumCharacterLimitError()
         }
 
-        this.value = normalizado
+        return new NormalizedName(normalizado)
     }
 
     getValue() :string{
         return this.value
     }
 
-    equals(other :NameNormalizado) :boolean{
+    equals(other?: NormalizedName): boolean {
+        if (!other) return false
         return this.value === other.value
     }
 }
