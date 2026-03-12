@@ -1,133 +1,132 @@
-// import { describe, it, expect, beforeEach, vi } from "vitest"
-// import bcrypt from "bcrypt"
+import { describe, it, expect, beforeEach, vi } from "vitest"
+import bcrypt from "bcrypt"
 
-// import { LoginUseCase } from "../../src/core/application/useCases/LoginUseCase"
-// import type { IUserQueryRepository } from "../../src/interfaces/repositories/UserRepository"
-// import type { TokenService } from "../../src/core/domain/services/TokenService"
+import { LoginUseCase } from "../../src/core/application/useCases/LoginUseCase"
 
-// import { InvalidCredentialsError } from "../../src/core/domain/erros/InvalidCredentialError"
-// import { UserNotFoundError } from "../../src/core/domain/erros/UserNotFoundError"
+import type { IUserQueryRepository } from "../../src/interfaces/repositories/UserRepository"
+import type { IRefreshTokenRepository } from "../../src/interfaces/repositories/RefreshTokenRepository"
+import type { TokenService } from "../../src/core/domain/services/TokenService"
 
-// import { makeUserQueryRepositoryMock } from "../factories/user/MakeUserRepositories"
-// import type { IRefreshTokenRepository } from "../../src/interfaces/repositories/RefreshTokenRepository"
-// import { makeRefreshTokenRepositoryMock } from "../factories/user/MakeRefreshTokenRepository"
+import { InvalidCredentialsError } from "../../src/core/domain/erros/InvalidCredentialError"
+import { UnauthorizedError } from "../../src/core/domain/erros/UnauthorizedError"
+import { UserNotFoundError } from "../../src/core/domain/erros/UserNotFoundError"
 
-// describe("LoginUseCase", () => {
-//   let userQueryRepository: IUserQueryRepository
-//   let refreshTokenRepository: IRefreshTokenRepository
-//   let tokenService: TokenService
-//   let sut: LoginUseCase
+import { makeUserQueryRepositoryMock } from "../factories/user/MakeUserRepositories"
+import { makeRefreshTokenRepositoryMock } from "../factories/user/MakeRefreshTokenRepository"
+import { makePersistedUser } from "../factories/user/MakePersistedUser"
 
-//   beforeEach(() => {
-//     userQueryRepository = makeUserQueryRepositoryMock()
-//     refreshTokenRepository = makeRefreshTokenRepositoryMock()
+describe("LoginUseCase", () => {
 
-//     tokenService = {
-//       generateAccessToken: vi.fn(),
-//       generateRefreshToken: vi.fn()
-//     } as unknown as TokenService
+  let userQueryRepository: IUserQueryRepository
+  let refreshTokenRepository: IRefreshTokenRepository
+  let tokenService: TokenService
+  let sut: LoginUseCase
 
-//     sut = new LoginUseCase(
-//       userQueryRepository,
-//       refreshTokenRepository,
-//       tokenService
-//     )
+  beforeEach(() => {
 
-//     vi.restoreAllMocks()
-//   })
+    userQueryRepository = makeUserQueryRepositoryMock()
+    refreshTokenRepository = makeRefreshTokenRepositoryMock()
 
-//   it("deve retornar accessToken e refreshToken quando credenciais forem válidas", async () => {
-//     userQueryRepository.findByEmail = vi.fn().mockResolvedValue({
-//       id: "user-id",
-//       email: "user@email.com",
-//       passwordChangeAt: null,
-//       deletedAt: null
-//     })
+    tokenService = {
+      generateAccessToken: vi.fn(),
+      generateRefreshToken: vi.fn()
+    } as unknown as TokenService
 
-//     userQueryRepository.findUserWithPasswordByEmail = vi.fn().mockResolvedValue({
-//       id: "user-id",
-//       email: "user@email.com",
-//       password: "hashed-password"
-//     })
+    sut = new LoginUseCase(
+      userQueryRepository,
+      refreshTokenRepository,
+      tokenService
+    )
 
-//     vi.spyOn(bcrypt, "compare").mockImplementation(async () => true)
+    vi.restoreAllMocks()
 
-//     ;(tokenService.generateAccessToken as any).mockReturnValue("access-token")
-//     ;(tokenService.generateRefreshToken as any).mockReturnValue("refresh-token")
+  })
 
-//     const result = await sut.execute(
-//       "user@email.com",
-//       "plain-password"
-//     )
+  it("deve retornar tokens quando credenciais forem válidas", async () => {
 
-//     expect(bcrypt.compare).toHaveBeenCalledWith(
-//       "plain-password",
-//       "hashed-password"
-//     )
+    userQueryRepository.findByEmail = vi.fn().mockResolvedValue(
+      makePersistedUser()
+    )
 
-//     expect(tokenService.generateAccessToken).toHaveBeenCalledWith("user-id")
-//     expect(tokenService.generateRefreshToken).toHaveBeenCalledWith("user-id")
+    vi.spyOn(bcrypt, "compare").mockResolvedValue(true as never)
 
-//     expect(result).toEqual({
-//       accessToken: "access-token",
-//       refreshToken: "refresh-token"
-//     })
-//   })
+    ;(tokenService.generateAccessToken as any).mockReturnValue("access-token")
 
-//   it("deve lançar InvalidCredentialsError se o email não existir", async () => {
-//     userQueryRepository.findByEmail = vi.fn().mockResolvedValue(null)
+    ;(tokenService.generateRefreshToken as any).mockReturnValue({
+      token: "refresh-token",
+      hash: "hashed-refresh-token",
+      expiresAt: new Date()
+    })
 
-//     await expect(
-//       sut.execute("user@email.com", "password")
-//     ).rejects.toBeInstanceOf(InvalidCredentialsError)
-//   })
+    const result = await sut.execute(
+      "user@email.com",
+      "plain-password"
+    )
 
-//   it("deve lançar UserNotFoundError se o usuário estiver deletado", async () => {
-//     userQueryRepository.findByEmail = vi.fn().mockResolvedValue({
-//       id: "user-id",
-//       email: "user@email.com",
-//       passwordChangeAt: null,
-//       deletedAt: new Date()
-//     })
+    expect(bcrypt.compare).toHaveBeenCalledWith(
+      "plain-password",
+      "hashed-password"
+    )
 
-//     await expect(
-//       sut.execute("user@email.com", "password")
-//     ).rejects.toBeInstanceOf(UserNotFoundError)
-//   })
+    expect(tokenService.generateAccessToken).toHaveBeenCalledWith(
+      "user-id",
+      "USER NAME",
+      "user@email.com",
+      null
+    )
 
-//   it("deve lançar InvalidCredentialsError se não encontrar usuário com senha", async () => {
-//     userQueryRepository.findByEmail = vi.fn().mockResolvedValue({
-//       id: "user-id",
-//       email: "user@email.com",
-//       passwordChangeAt: null,
-//       deletedAt: null
-//     })
+    expect(refreshTokenRepository.create).toHaveBeenCalledWith({
+      userId: "user-id",
+      tokenHash: "hashed-refresh-token",
+      expiresAt: expect.any(Date)
+    })
 
-//     userQueryRepository.findUserWithPasswordByEmail = vi.fn().mockResolvedValue(null)
+    expect(result).toEqual({
+      accessToken: "access-token",
+      refreshToken: "refresh-token"
+    })
 
-//     await expect(
-//       sut.execute("user@email.com", "password")
-//     ).rejects.toBeInstanceOf(InvalidCredentialsError)
-//   })
+  })
 
-//   it("deve lançar InvalidCredentialsError se a senha for inválida", async () => {
-//     userQueryRepository.findByEmail = vi.fn().mockResolvedValue({
-//       id: "user-id",
-//       email: "user@email.com",
-//       passwordChangeAt: null,
-//       deletedAt: null
-//     })
+  it("deve lançar UnauthorizedError se o email não existir", async () => {
 
-//     userQueryRepository.findUserWithPasswordByEmail = vi.fn().mockResolvedValue({
-//       id: "user-id",
-//       email: "user@email.com",
-//       password: "hashed-password"
-//     })
+    userQueryRepository.findByEmail = vi.fn().mockResolvedValue(null)
 
-//     vi.spyOn(bcrypt, "compare").mockImplementation(async () => false)
+    await expect(
+      sut.execute("user@email.com", "password")
+    ).rejects.toBeInstanceOf(UnauthorizedError)
 
-//     await expect(
-//       sut.execute("user@email.com", "wrong-password")
-//     ).rejects.toBeInstanceOf(InvalidCredentialsError)
-//   })
-// })
+  })
+
+  it("deve lançar UserNotFoundError se o usuário estiver deletado", async () => {
+
+    userQueryRepository.findByEmail = vi.fn().mockResolvedValue({
+      id: "user-id",
+      name: "USER NAME",
+      email: "user@email.com",
+      password: "hashed-password",
+      passwordChangeAt: null,
+      deletedAt: new Date()
+    })
+
+    await expect(
+      sut.execute("user@email.com", "password")
+    ).rejects.toBeInstanceOf(UserNotFoundError)
+
+  })
+
+  it("deve lançar InvalidCredentialsError se a senha for inválida", async () => {
+
+    userQueryRepository.findByEmail = vi.fn().mockResolvedValue(
+      makePersistedUser()
+    )
+
+    vi.spyOn(bcrypt, "compare").mockResolvedValue(false as never)
+
+    await expect(
+      sut.execute("user@email.com", "wrong-password")
+    ).rejects.toBeInstanceOf(InvalidCredentialsError)
+
+  })
+
+})

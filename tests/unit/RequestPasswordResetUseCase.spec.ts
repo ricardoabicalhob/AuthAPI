@@ -1,83 +1,83 @@
-// import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach, vi } from "vitest"
 
-// import { RequestPasswordResetUseCase } from "../../src/core/application/useCases/RequestPasswordResetUseCase"
-// import type { IUserRepository, IUserQueryRepository } from "../../src/interfaces/repositories/UserRepository"
-// import type { TokenService } from "../../src/core/domain/services/TokenService"
-// import type { MailService } from "../../src/core/domain/services/MailService"
+import { RequestPasswordResetUseCase } from "../../src/core/application/useCases/RequestPasswordResetUseCase"
+import type { IUserRepository, IUserQueryRepository } from "../../src/interfaces/repositories/UserRepository"
+import type { TokenService } from "../../src/core/domain/services/TokenService"
+import type { MailService } from "../../src/core/domain/services/MailService"
 
-// import {
-//   makeUserRepositoryMock,
-//   makeUserQueryRepositoryMock
-// } from "../factories/user/MakeUserRepositories"
+import {
+  makeUserRepositoryMock,
+  makeUserQueryRepositoryMock
+} from "../factories/user/MakeUserRepositories"
+import { makePersistedUser } from "../factories/user/MakePersistedUser"
 
-// describe("RequestPasswordResetUseCase", () => {
-//   let userRepository: IUserRepository
-//   let userQueryRepository: IUserQueryRepository
-//   let tokenService: TokenService
-//   let mailService: MailService
-//   let sut: RequestPasswordResetUseCase
+describe("RequestPasswordResetUseCase", () => {
+  let userRepository: IUserRepository
+  let userQueryRepository: IUserQueryRepository
+  let tokenService: TokenService
+  let mailService: MailService
+  let sut: RequestPasswordResetUseCase
 
-//   beforeEach(() => {
-//     vi.restoreAllMocks()
+  beforeEach(() => {
+    vi.restoreAllMocks()
 
-//     userRepository = makeUserRepositoryMock()
-//     userQueryRepository = makeUserQueryRepositoryMock()
+    process.env.FRONTEND_URL = "http://localhost:5173"
 
-//     tokenService = {
-//       generateResetToken: vi.fn()
-//     } as unknown as TokenService
+    userRepository = makeUserRepositoryMock()
+    userQueryRepository = makeUserQueryRepositoryMock()
 
-//     mailService = {
-//       sendPasswordReset: vi.fn()
-//     } as unknown as MailService
+    tokenService = {
+      generateResetToken: vi.fn()
+    } as unknown as TokenService
 
-//     sut = new RequestPasswordResetUseCase(
-//       userRepository,
-//       userQueryRepository,
-//       tokenService,
-//       mailService
-//     )
-//   })
+    mailService = {
+      sendPasswordReset: vi.fn()
+    } as unknown as MailService
 
-//   it("não deve fazer nada se o usuário não existir", async () => {
-//     vi.spyOn(userQueryRepository, "findByEmail").mockResolvedValue(null)
+    sut = new RequestPasswordResetUseCase(
+      userRepository,
+      userQueryRepository,
+      tokenService,
+      mailService
+    )
+  })
 
-//     await sut.execute("user@email.com")
+  it("não deve fazer nada se o usuário não existir", async () => {
+    vi.spyOn(userQueryRepository, "findByEmail").mockResolvedValue(null)
 
-//     expect(userRepository.savePasswordResetToken).not.toHaveBeenCalled()
-//     expect(mailService.sendPasswordReset).not.toHaveBeenCalled()
-//   })
+    await sut.execute("user@email.com")
 
-//   it("deve gerar token, salvar hash e enviar e-mail quando usuário existir", async () => {
-//     vi.spyOn(userQueryRepository, "findByEmail").mockResolvedValue({
-//       id: "user-id",
-//       email: "user@email.com",
-//       passwordChangeAt: null,
-//       deletedAt: null
-//     })
+    expect(userRepository.savePasswordResetToken).not.toHaveBeenCalled()
+    expect(mailService.sendPasswordReset).not.toHaveBeenCalled()
+  })
 
-//     vi.spyOn(tokenService, "generateResetToken").mockReturnValue({
-//       token: "plain-reset-token",
-//       hash: "hashed-reset-token"
-//     })
+  it("deve gerar token, salvar hash e enviar e-mail quando usuário existir", async () => {
+    vi.spyOn(userQueryRepository, "findByEmail").mockResolvedValue(
+        makePersistedUser()
+    )
 
-//     const nowSpy = vi.spyOn(Date, "now").mockReturnValue(1_000_000)
+    vi.spyOn(tokenService, "generateResetToken").mockReturnValue({
+      token: "plain-reset-token",
+      hash: "hashed-reset-token"
+    })
 
-//     await sut.execute("user@email.com")
+    const nowSpy = vi.spyOn(Date, "now").mockReturnValue(1_000_000)
 
-//     expect(tokenService.generateResetToken).toHaveBeenCalled()
+    await sut.execute("user@email.com")
 
-//     expect(userRepository.savePasswordResetToken).toHaveBeenCalledWith(
-//       "user-id",
-//       "hashed-reset-token",
-//       new Date(1_000_000 + 15 * 60 * 1000)
-//     )
+    expect(tokenService.generateResetToken).toHaveBeenCalled()
 
-//     expect(mailService.sendPasswordReset).toHaveBeenCalledWith(
-//       "user@email.com",
-//       "http://localhost:5173?token=plain-reset-token"
-//     )
+    expect(userRepository.savePasswordResetToken).toHaveBeenCalledWith(
+      "user-id",
+      "hashed-reset-token",
+      new Date(1_000_000 + 15 * 60 * 1000)
+    )
 
-//     nowSpy.mockRestore()
-//   })
-// })
+    expect(mailService.sendPasswordReset).toHaveBeenCalledWith(
+      "user@email.com",
+      "http://localhost:5173?token=plain-reset-token"
+    )
+
+    nowSpy.mockRestore()
+  })
+})

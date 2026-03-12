@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto"
-import { NormalizedName } from "../value-objects/NameNormalizado"
+import { NormalizedName } from "../value-objects/NormalizedName"
 import { Email } from "../value-objects/Email"
 import { PasswordHash } from "../value-objects/PasswordHash"
 

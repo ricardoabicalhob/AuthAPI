@@ -18,8 +18,6 @@ export function makeUserQueryRepositoryMock(): Mocked<IUserQueryRepository> {
   return {
     findById: vi.fn(),
     findByEmail: vi.fn(),
-    findByPasswordResetToken: vi.fn(),
-    findUserWithPasswordByEmail: vi.fn(),
-    findUserWithPasswordById: vi.fn()
+    findByPasswordResetToken: vi.fn()
   }
 }

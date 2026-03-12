@@ -24,7 +24,6 @@ interface IUserQueryRepository {
     findById(id :string) :Promise<UserResponseDTO | null>
     findByEmail(email :string) :Promise<UserResponseDTO | null>
     findByPasswordResetToken(token :string) :Promise<UserResponseDTO | null>
-    findUserWithPasswordById(id :string) :Promise<UserResponseDTO | null>
 }
 
 export type { IUserRepository, IUserQueryRepository }

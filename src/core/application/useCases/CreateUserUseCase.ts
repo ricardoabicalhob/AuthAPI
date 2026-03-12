@@ -4,7 +4,7 @@ import { User } from "../../domain/entities/User.entity";
 import { EmailAlreadyRegisteredError } from "../../domain/erros/EmailAlreadyRegisteredError";
 import type { PasswordHasher } from "../../domain/services/PasswordHasher";
 import { Email } from "../../domain/value-objects/Email";
-import { NormalizedName } from "../../domain/value-objects/NameNormalizado";
+import { NormalizedName } from "../../domain/value-objects/NormalizedName";
 import { Password } from "../../domain/value-objects/Password";
 import { PasswordHash } from "../../domain/value-objects/PasswordHash";
 

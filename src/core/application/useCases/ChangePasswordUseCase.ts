@@ -20,7 +20,7 @@ export class ChangePasswordUseCase {
         newPassword :string
     ) :Promise<void> {
 
-        const userPersistido = await this.userQueryRepository.findUserWithPasswordById(userId)
+        const userPersistido = await this.userQueryRepository.findById(userId)
 
         if(!userPersistido) {
             throw new UserNotFoundError()

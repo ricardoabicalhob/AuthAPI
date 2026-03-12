@@ -165,25 +165,6 @@ class UserPrismaQueryRepository implements IUserQueryRepository {
         })
         return result
     }
-
-    async findUserWithPasswordById(id: string): Promise<UserResponseDTO | null> {
-        const result = await prismaClient.user.findFirst({
-            where: {
-                id
-            },
-            select: {
-                id: true,
-                email: true,
-                name: true,
-                password: true,
-                passwordChangeAt: true,
-                passwordResetToken: true,
-                passwordResetExpiresAt: true,
-                deletedAt: true
-            }
-        })
-        return result
-    }
 }
 
 export { UserPrismaRepository, UserPrismaQueryRepository }
